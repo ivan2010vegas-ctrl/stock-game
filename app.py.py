@@ -123,33 +123,54 @@ def safe_row_get(row, candidates, default=""):
 # Google Sheets helpers
 # -----------------------
 @st.cache_resource
-def get_gspread_client(credentials_path="credentials.json"):
-    if not os.path.exists(credentials_path):
-        raise FileNotFoundError("credentials.json не найден в рабочей директории.")
-    scope = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(credentials_path, scope)
+def get_gspread_client():
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive",
+    ]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(
+        st.secrets["gcp_service_account"],
+        scope
+    )
     return gspread.authorize(creds)
 
 @st.cache_data(ttl=5)
-def load_reference_tables(credentials_path="credentials.json"):
-    client = get_gspread_client(credentials_path)
-    try:
-        df_zavod = pd.DataFrame(client.open("«Таблица дификаторы_заводские_проценты»").sheet1.get_all_records())
-    except Exception:
-        df_zavod = pd.DataFrame(columns=["Значение", "%"])
-    try:
-        df_region = pd.DataFrame(client.open("Таблица «Модификаторы_региональные_проценты»").sheet1.get_all_records())
-    except Exception:
-        df_region = pd.DataFrame(columns=["Значение", "%"])
-    return df_zavod, df_region
+def load_reference_tables():
+    client = get_gspread_client()
+
 
 @st.cache_data(ttl=5)
-def load_stocks_table(credentials_path="credentials.json"):
-    client = get_gspread_client(credentials_path)
+def load_reference_tables():
+    client = get_gspread_client()
     try:
-        return pd.DataFrame(client.open("«Акции»").worksheet("Лист1").get_all_records())
+        df_zavod = pd.DataFrame(
+            client.open("Таблица дификаторы_заводские_проценты")
+            .sheet1.get_all_records()
+        )
+    except Exception:
+        df_zavod = pd.DataFrame(columns=["Значение", "%"])
+
+    try:
+        df_region = pd.DataFrame(
+            client.open("Модификаторы_региональные_проценты")
+            .sheet1.get_all_records()
+        )
+    except Exception:
+        df_region = pd.DataFrame(columns=["Значение", "%"])
+
+    return df_zavod, df_region
+
+
+@st.cache_data(ttl=5)
+def load_stocks_table():
+    client = get_gspread_client()
+    try:
+        return pd.DataFrame(
+            client.open("Акции").worksheet("Лист1").get_all_records()
+        )
     except Exception:
         return pd.DataFrame()
+
 
 @st.cache_resource
 def get_buy_worksheet(credentials_path="credentials.json"):
@@ -775,5 +796,6 @@ with st.sidebar:
         if st.button("Выход"):
             st.session_state.user = None
             st.rerun()
+
 
 market_display()
