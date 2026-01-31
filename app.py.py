@@ -1228,8 +1228,10 @@ stock_html = f"""
     </div>
 """
 # Важно: используем именно st.markdown с ключом unsafe_allow_html=True
-st.markdown(stock_html, unsafe_allow_html=True)
+# Отрисовка самой карточки
+            st.markdown(stock_html, unsafe_allow_html=True)
 
+            # Кнопки под карточкой — ПРОВЕРЬ ОТСТУПЫ ЗДЕСЬ
             btn_col1, btn_col2, btn_col3 = st.columns([1, 2, 1])
             with btn_col2:
                 if st.button("🛒 КУПИТЬ", key=f"buy_{item['Название']}_{idx}", use_container_width=True):
@@ -1351,3 +1353,4 @@ with st.sidebar:
     """)
 
 market_display()
+
