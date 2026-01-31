@@ -712,7 +712,6 @@ if st.session_state.view_mode == "portfolio":
                     tokens = st.session_state['last_tokens_map'].get(stock_name, [])
                     raw = st.session_state['last_raw_map'].get(stock_name, '')
                     st.write(f"• {stock_name}: raw='{raw}' tokens={tokens} -> found={mods}")
-        else:
 
 if st.session_state.view_mode == "top":
     processed = sorted(processed, key=lambda x: x['pct'], reverse=True)[:9]
@@ -825,6 +824,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
