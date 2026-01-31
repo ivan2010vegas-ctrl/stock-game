@@ -714,8 +714,8 @@ if st.session_state.view_mode == "portfolio":
                     st.write(f"• {stock_name}: raw='{raw}' tokens={tokens} -> found={mods}")
         else:
 
-    if st.session_state.view_mode == "top":
-        processed = sorted(processed, key=lambda x: x['pct'], reverse=True)[:9]
+if st.session_state.view_mode == "top":
+    processed = sorted(processed, key=lambda x: x['pct'], reverse=True)[:9]
 
     cols = st.columns(3)
     for idx, item in enumerate(processed):
@@ -725,6 +725,8 @@ if st.session_state.view_mode == "portfolio":
             pct_text = f"{sign}{pct:.2f}%"
             color_cls = "pos" if pct >= 0 else "neg"
             highlight = "highlight-100" if abs(pct) > 100 else ""
+            # здесь можно дальше выводить данные с st.write или st.markdown
+
 
             st.markdown(f"""
                 <div class="stock-card {highlight}">
@@ -823,6 +825,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
