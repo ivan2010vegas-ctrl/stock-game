@@ -152,7 +152,7 @@ def load_reference_tables():
     client = get_gspread_client()
     try:
         df_zavod = pd.DataFrame(
-            client.open("Таблица дификаторы_заводские_проценты")
+            client.open("«Таблица дификаторы_заводские_проценты»")
             .sheet1.get_all_records()
         )
     except Exception:
@@ -160,7 +160,7 @@ def load_reference_tables():
 
     try:
         df_region = pd.DataFrame(
-            client.open("Модификаторы_региональные_проценты")
+            client.open("Таблица «Модификаторы_региональные_проценты»")
             .sheet1.get_all_records()
         )
     except Exception:
@@ -173,20 +173,11 @@ def load_reference_tables():
 def load_stocks_table():
     client = get_gspread_client()
     try:
-        sheet = client.open("Акции")
-        worksheet = sheet.worksheet("Лист1")
-        data = worksheet.get_all_records()
-        df = pd.DataFrame(data)
-        st.success(f"✅ Загружено {len(df)} строк из таблицы 'Акции'")
-        return df
+        return pd.DataFrame(
+            client.open("«Акции»").worksheet("Лист1").get_all_records()
+        )
     except Exception as e:
-        st.error(f"❌ Ошибка загрузки таблицы 'Акции': {type(e).__name__}: {str(e)}")
-        # Показываем доступные таблицы
-        try:
-            all_sheets = client.openall()
-            st.warning(f"Доступные таблицы: {[s.title for s in all_sheets]}")
-        except:
-            pass
+        st.error(f"Ошибка загрузки таблицы 'Акции': {e}")
         return pd.DataFrame()
 
 
@@ -826,6 +817,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
