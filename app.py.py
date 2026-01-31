@@ -384,30 +384,34 @@ st.session_state.setdefault('purchase_dialog', None)
 # -----------------------
 @st.fragment(run_every=30)
 def market_display():
-    # Диагностика подключения
-with st.expander("🔍 Диагностика подключения", expanded=True):
-    try:
-        client = get_gspread_client()
-        st.write("✅ Клиент создан")
-        
-        sheets = client.openall()
-        st.write(f"✅ Доступно таблиц: {len(sheets)}")
-        st.write("Список таблиц:", [s.title for s in sheets])
-        
-        target_sheet = client.open("Акции")
-        st.write(f"✅ Таблица 'Акции' найдена")
-        
-        worksheets = target_sheet.worksheets()
-        st.write(f"Листы в таблице: {[w.title for w in worksheets]}")
-        
-    except Exception as e:
-        st.error(f"❌ Ошибка: {type(e).__name__}: {str(e)}")
     st.markdown("<h1 style='color:#f0b90b; margin-bottom:6px;'>Ванина игра</h1>", unsafe_allow_html=True)
+    
+    # ========== ДИАГНОСТИКА (добавьте сразу после заголовка) ==========
+    with st.expander("🔍 Диагностика подключения", expanded=True):
+        try:
+            client = get_gspread_client()
+            st.write("✅ Клиент создан")
+            
+            sheets = client.openall()
+            st.write(f"✅ Доступно таблиц: {len(sheets)}")
+            st.write("Список таблиц:", [s.title for s in sheets])
+            
+            target_sheet = client.open("Акции")
+            st.write(f"✅ Таблица 'Акции' найдена")
+            
+            worksheets = target_sheet.worksheets()
+            st.write(f"Листы в таблице: {[w.title for w in worksheets]}")
+            
+        except Exception as e:
+            st.error(f"❌ Ошибка: {type(e).__name__}: {str(e)}")
+    # ========== КОНЕЦ ДИАГНОСТИКИ ==========
 
     # -----------------------
     # Новости
     # -----------------------
     news_list = [
+        "Новости 1: Рост рынка золота удивляет экспертов.",
+        # ... остальной код
     "Новости 1: Рост рынка золота удивляет экспертов.",
     "Новости 2: Открылся новый завод, возможно это принесет подбавку к заводским акциям.",
     "Новости 3: Акции компаний резко упали.",
@@ -822,6 +826,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
