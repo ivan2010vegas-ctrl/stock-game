@@ -173,21 +173,23 @@ def load_stocks_table():
 
 
 @st.cache_resource
-def get_buy_worksheet(credentials_path="credentials.json"):
-    client = get_gspread_client(credentials_path)
+def get_buy_worksheet():
+    client = get_gspread_client()
     try:
         return client.open("Таблица «Покупки»").worksheet("Лист6")
     except Exception:
         return None
 
+
 @st.cache_data(ttl=10)
-def load_purchases(credentials_path="credentials.json"):
-    client = get_gspread_client(credentials_path)
+def load_purchases():
+    client = get_gspread_client()
     try:
         ws = client.open("Таблица «Покупки»").worksheet("Лист6")
         return pd.DataFrame(ws.get_all_records())
     except Exception:
         return pd.DataFrame(columns=["time", "who", "name", "price", "tx_id"])
+
 
 def remove_stock_from_purchases_sheet(stock_name):
     try:
@@ -799,3 +801,4 @@ with st.sidebar:
 
 
 market_display()
+
