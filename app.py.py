@@ -562,6 +562,18 @@ except Exception:
     st.error("Не удалось отфильтровать открытые акции.")
     st.stop()
 
+# --- Вычисляем влияние золота ---
+if len(st.session_state.gold_history) >= 2:
+    prev_gold = st.session_state.gold_history[-2]['close']
+    curr_gold = st.session_state.gold_history[-1]['close']
+    gold_imp = ((curr_gold - prev_gold) / prev_gold) * 100 if prev_gold != 0 else 0.0
+else:
+    gold_imp = 0.0
+
+# --- Списки для обработки ---
+processed = []
+removed_stock_names = set()
+
 # --- Цикл по открытым акциям ---
 for i, row in open_stocks.iterrows():
     name = safe_row_get(row, [name_col] if name_col else [], default=f'#{i}')
@@ -574,6 +586,8 @@ for i, row in open_stocks.iterrows():
     
     # --- Статус для этой строки ---
     status_value = row[status_col]
+    
+    # ... остальной код цикла
 
     # --- Здесь можно дальше обрабатывать акции, модификаторы и т.д. ---
 
@@ -841,6 +855,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
