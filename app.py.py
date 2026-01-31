@@ -12,194 +12,532 @@ import re
 st.set_page_config(page_title="Ванина игра", layout="wide")
 
 # -----------------------
-# CSS - Полный красивый дизайн
+# CSS - СУПЕР ДЕТАЛИЗИРОВАННЫЙ ДИЗАЙН
 # -----------------------
 st.markdown("""
     <style>
     [data-testid="stStatusWidget"] { visibility: hidden !important; }
-    .stApp { background-color: #0b0e11; color: #FFFFFF; }
+    .stApp { 
+        background: linear-gradient(135deg, #0a0d10 0%, #0b0e11 50%, #0d1015 100%);
+        color: #FFFFFF; 
+    }
 
+    /* Анимированный фон для заголовка */
+    @keyframes borderGlow {
+        0%, 100% { 
+            box-shadow: 
+                0 0 20px rgba(240,185,11,0.3),
+                0 0 40px rgba(14,203,129,0.2),
+                inset 0 0 30px rgba(240,185,11,0.1);
+        }
+        50% { 
+            box-shadow: 
+                0 0 40px rgba(240,185,11,0.5),
+                0 0 60px rgba(14,203,129,0.3),
+                inset 0 0 40px rgba(240,185,11,0.2);
+        }
+    }
+    
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    .header-container {
+        position: relative;
+        padding: 30px;
+        margin: -20px -20px 30px -20px;
+        background: linear-gradient(135deg, 
+            rgba(240,185,11,0.1) 0%, 
+            rgba(14,203,129,0.1) 25%,
+            rgba(240,185,11,0.1) 50%,
+            rgba(14,203,129,0.1) 75%,
+            rgba(240,185,11,0.1) 100%);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+        border-bottom: 3px solid;
+        border-image: linear-gradient(90deg, #f0b90b, #0ecb81, #f0b90b) 1;
+        box-shadow: 
+            0 4px 20px rgba(240,185,11,0.3),
+            inset 0 -2px 10px rgba(240,185,11,0.1);
+    }
+    
+    .header-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            #f0b90b 20%, 
+            #0ecb81 50%, 
+            #f0b90b 80%, 
+            transparent 100%);
+        animation: borderGlow 3s ease-in-out infinite;
+    }
+    
+    .header-container::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            #0ecb81 20%, 
+            #f0b90b 50%, 
+            #0ecb81 80%, 
+            transparent 100%);
+        animation: borderGlow 3s ease-in-out infinite reverse;
+    }
+
+    .main-title {
+        color: #f0b90b;
+        margin: 0;
+        text-shadow: 
+            0 0 10px rgba(240,185,11,0.5),
+            0 0 20px rgba(240,185,11,0.3),
+            0 0 30px rgba(240,185,11,0.2),
+            2px 2px 4px rgba(0,0,0,0.5);
+        font-size: 48px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Кнопки */
     div.stButton > button {
         background: linear-gradient(135deg, #1a1d20 0%, #000000 100%) !important;
         color: #FFFFFF !important;
-        border-radius: 8px !important;
-        border: 1px solid #2b2b2b !important;
-        padding: 8px 16px !important;
-        font-weight: 600 !important;
-        transition: all 0.3s ease !important;
+        border-radius: 12px !important;
+        border: 2px solid #2b2b2b !important;
+        padding: 12px 20px !important;
+        font-weight: 700 !important;
+        transition: all 0.4s ease !important;
+        position: relative !important;
+        overflow: hidden !important;
+        font-size: 14px !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    div.stButton > button::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(240,185,11,0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s, height 0.6s;
+    }
+    
+    div.stButton > button:hover::before {
+        width: 300px;
+        height: 300px;
     }
     
     div.stButton > button:hover {
         border-color: #f0b90b !important;
-        box-shadow: 0 0 20px rgba(240,185,11,0.3) !important;
-        transform: translateY(-2px) !important;
+        box-shadow: 
+            0 0 20px rgba(240,185,11,0.4),
+            0 0 40px rgba(240,185,11,0.2),
+            inset 0 0 20px rgba(240,185,11,0.1) !important;
+        transform: translateY(-3px) scale(1.02) !important;
+        background: linear-gradient(135deg, #2a2d30 0%, #1a1d20 100%) !important;
+    }
+    
+    div.stButton > button:active {
+        transform: translateY(-1px) scale(0.98) !important;
     }
 
+    /* Карточки акций */
     .stock-card { 
         background: linear-gradient(135deg, #1a1d20 0%, #0e1113 100%); 
         border-radius: 16px; 
-        padding: 20px; 
-        border: 1px solid #2b2f33; 
+        padding: 24px; 
+        border: 2px solid #2b2f33; 
         margin-bottom: 16px; 
-        min-height: 200px; 
+        min-height: 220px; 
         display: flex; 
         flex-direction: column; 
         justify-content: space-between;
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         position: relative;
         overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
     
     .stock-card::before {
         content: '';
         position: absolute;
         top: 0;
-        left: 0;
-        right: 0;
+        left: -100%;
+        width: 100%;
         height: 3px;
-        background: linear-gradient(90deg, #f0b90b, #0ecb81);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-    
-    .stock-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(240,185,11,0.2);
-        border-color: #f0b90b;
+        background: linear-gradient(90deg, transparent, #f0b90b, transparent);
+        transition: left 0.5s;
     }
     
     .stock-card:hover::before {
+        left: 100%;
+    }
+    
+    .stock-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 50% 0%, rgba(240,185,11,0.05), transparent 70%);
+        opacity: 0;
+        transition: opacity 0.4s;
+    }
+    
+    .stock-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 
+            0 12px 28px rgba(0,0,0,0.5),
+            0 0 30px rgba(240,185,11,0.2),
+            inset 0 0 20px rgba(240,185,11,0.05);
+        border-color: #f0b90b;
+    }
+    
+    .stock-card:hover::after {
         opacity: 1;
     }
     
-    .stock-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-    .stock-name { color: #FFFFFF; font-size: 22px; font-weight: 700; margin-bottom: 4px; line-height: 1.2; }
-    .stock-type { 
-        color: #9aa0a6; 
-        font-size: 13px; 
-        text-transform: uppercase; 
-        letter-spacing: 1px;
-        background: rgba(154,160,166,0.1);
-        padding: 4px 8px;
-        border-radius: 4px;
-        display: inline-block;
-        margin-top: 4px;
-    }
-    .old-price { color: #9aa0a6; font-size: 14px; text-decoration: line-through; }
-    .current-price { color: #f0b90b; font-size: 32px; font-weight: 800; line-height: 1; text-shadow: 0 0 10px rgba(240,185,11,0.3); }
-    .change-pct { font-size: 24px; font-weight: 800; }
-    .pos { color: #0ecb81; } 
-    .neg { color: #f6465d; }
-    .highlight-100 { 
-        box-shadow: 0 0 30px rgba(240,185,11,0.3); 
-        border: 2px solid #f0b90b;
-        animation: pulse 2s infinite;
+    .stock-name { 
+        color: #FFFFFF; 
+        font-size: 24px; 
+        font-weight: 800; 
+        margin-bottom: 6px; 
+        line-height: 1.2;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
     
-    @keyframes pulse {
-        0%, 100% { box-shadow: 0 0 20px rgba(240,185,11,0.3); }
-        50% { box-shadow: 0 0 40px rgba(240,185,11,0.6); }
+    .stock-type { 
+        color: #9aa0a6; 
+        font-size: 12px; 
+        text-transform: uppercase; 
+        letter-spacing: 1.5px;
+        background: rgba(154,160,166,0.15);
+        padding: 6px 12px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-top: 6px;
+        font-weight: 600;
+        border: 1px solid rgba(154,160,166,0.2);
+    }
+    
+    .old-price { 
+        color: #666; 
+        font-size: 15px; 
+        text-decoration: line-through;
+        margin-bottom: 4px;
+    }
+    
+    .current-price { 
+        color: #f0b90b; 
+        font-size: 36px; 
+        font-weight: 900; 
+        line-height: 1; 
+        text-shadow: 
+            0 0 10px rgba(240,185,11,0.4),
+            0 2px 4px rgba(0,0,0,0.3);
+        letter-spacing: -1px;
+    }
+    
+    .change-pct { 
+        font-size: 26px; 
+        font-weight: 900;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .pos { 
+        color: #0ecb81;
+        text-shadow: 0 0 10px rgba(14,203,129,0.4);
+    } 
+    
+    .neg { 
+        color: #f6465d;
+        text-shadow: 0 0 10px rgba(246,70,93,0.4);
+    }
+    
+    .highlight-100 { 
+        box-shadow: 
+            0 0 30px rgba(240,185,11,0.4),
+            0 12px 28px rgba(0,0,0,0.5),
+            inset 0 0 30px rgba(240,185,11,0.1); 
+        border: 2px solid #f0b90b;
+        animation: megaPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes megaPulse {
+        0%, 100% { 
+            box-shadow: 
+                0 0 30px rgba(240,185,11,0.4),
+                0 12px 28px rgba(0,0,0,0.5),
+                inset 0 0 30px rgba(240,185,11,0.1);
+            transform: scale(1);
+        }
+        50% { 
+            box-shadow: 
+                0 0 50px rgba(240,185,11,0.6),
+                0 16px 32px rgba(0,0,0,0.6),
+                inset 0 0 40px rgba(240,185,11,0.2);
+            transform: scale(1.02);
+        }
     }
 
+    /* Портфель */
     .portfolio-header { 
-        background: linear-gradient(135deg, #1a1d20 0%, #0e1113 100%); 
-        border-radius: 12px; 
-        padding: 24px; 
-        margin-bottom: 20px; 
+        background: linear-gradient(135deg, 
+            rgba(240,185,11,0.15) 0%, 
+            rgba(26,29,32,0.8) 50%,
+            rgba(14,203,129,0.15) 100%); 
+        border-radius: 16px; 
+        padding: 32px; 
+        margin-bottom: 24px; 
         border: 2px solid #f0b90b;
-        box-shadow: 0 4px 20px rgba(240,185,11,0.2);
+        box-shadow: 
+            0 8px 24px rgba(240,185,11,0.3),
+            inset 0 0 40px rgba(240,185,11,0.1);
+        position: relative;
+        overflow: hidden;
     }
-    .portfolio-stat { text-align: center; padding: 16px; }
+    
+    .portfolio-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(240,185,11,0.1), transparent 70%);
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .portfolio-stat { 
+        text-align: center; 
+        padding: 20px;
+        position: relative;
+        z-index: 1;
+    }
+    
     .stat-label { 
         color: #9aa0a6; 
         font-size: 13px; 
         text-transform: uppercase; 
-        letter-spacing: 0.5px; 
-        margin-bottom: 8px;
-        font-weight: 600;
+        letter-spacing: 1px; 
+        margin-bottom: 10px;
+        font-weight: 700;
     }
+    
     .stat-value { 
         color: #FFFFFF; 
-        font-size: 28px; 
-        font-weight: 800;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        font-size: 32px; 
+        font-weight: 900;
+        text-shadow: 
+            0 2px 4px rgba(0,0,0,0.4),
+            0 0 10px rgba(255,255,255,0.2);
     }
+    
     .position-item { 
         background: linear-gradient(135deg, #1a1d20 0%, #161719 100%); 
         border-radius: 12px; 
-        padding: 20px; 
-        margin-bottom: 12px; 
-        border: 1px solid #2b2f33;
+        padding: 24px; 
+        margin-bottom: 16px; 
+        border: 2px solid #2b2f33;
         transition: all 0.3s ease;
-    }
-    .position-item:hover {
-        border-color: #f0b90b;
-        transform: translateX(4px);
-    }
-    .position-title { color: #f0b90b; font-size: 20px; font-weight: 700; }
-    .small-muted { color: #888; font-size: 13px; }
-    .purchase-dialog { 
-        background: linear-gradient(180deg, #1a1d20, #0e1113); 
-        border: 2px solid #f0b90b; 
-        border-radius: 12px; 
-        padding: 20px; 
-        margin: 10px 0;
-        box-shadow: 0 8px 32px rgba(240,185,11,0.3);
-    }
-    .total-price { 
-        color: #0ecb81; 
-        font-size: 24px; 
-        font-weight: 800; 
-        text-align: center; 
-        padding: 15px; 
-        background: rgba(14,203,129,0.1); 
-        border-radius: 8px; 
-        margin: 10px 0;
-        border: 1px solid rgba(14,203,129,0.3);
+        position: relative;
+        overflow: hidden;
     }
     
+    .position-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, #f0b90b, #0ecb81);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+    }
+    
+    .position-item:hover {
+        border-color: #f0b90b;
+        transform: translateX(8px);
+        box-shadow: 0 4px 16px rgba(240,185,11,0.2);
+    }
+    
+    .position-item:hover::before {
+        transform: scaleY(1);
+    }
+    
+    .position-title { 
+        color: #f0b90b; 
+        font-size: 22px; 
+        font-weight: 800;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .small-muted { 
+        color: #888; 
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Диалог покупки */
+    .purchase-dialog { 
+        background: linear-gradient(180deg, #1a1d20, #0e1113); 
+        border: 3px solid #f0b90b; 
+        border-radius: 16px; 
+        padding: 28px; 
+        margin: 16px 0;
+        box-shadow: 
+            0 12px 40px rgba(240,185,11,0.4),
+            inset 0 0 30px rgba(240,185,11,0.1);
+        animation: dialogSlideIn 0.4s ease;
+    }
+    
+    @keyframes dialogSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .total-price { 
+        color: #0ecb81; 
+        font-size: 28px; 
+        font-weight: 900; 
+        text-align: center; 
+        padding: 20px; 
+        background: linear-gradient(135deg, rgba(14,203,129,0.15), rgba(14,203,129,0.05)); 
+        border-radius: 12px; 
+        margin: 16px 0;
+        border: 2px solid rgba(14,203,129,0.4);
+        box-shadow: 
+            0 4px 16px rgba(14,203,129,0.2),
+            inset 0 0 20px rgba(14,203,129,0.1);
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    /* Новостная лента */
     .news-banner {
-        background: linear-gradient(135deg, #1a1d20 0%, #2b1a1f 100%);
+        background: linear-gradient(135deg, 
+            rgba(240,185,11,0.08) 0%, 
+            rgba(26,29,32,0.6) 50%,
+            rgba(14,203,129,0.08) 100%);
         border-left: 4px solid #f0b90b;
-        padding: 16px 20px;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        animation: slideIn 0.5s ease;
+        padding: 20px 24px;
+        border-radius: 12px;
+        margin-bottom: 24px;
+        animation: slideIn 0.6s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        border-right: 4px solid #0ecb81;
     }
     
     @keyframes slideIn {
-        from { opacity: 0; transform: translateX(-20px); }
-        to { opacity: 1; transform: translateX(0); }
+        from { 
+            opacity: 0; 
+            transform: translateX(-30px); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateX(0); 
+        }
     }
     
-    .nav-button {
-        background: linear-gradient(135deg, #1a1d20 0%, #000000 100%);
-        border: 1px solid #2b2b2b;
-        border-radius: 8px;
-        padding: 12px;
-        margin: 4px 0;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .nav-button:hover {
-        border-color: #f0b90b;
-        background: linear-gradient(135deg, #2a2d30 0%, #1a1d20 100%);
-    }
-    
+    /* Виджет золота */
     .gold-widget {
-        background: linear-gradient(135deg, #2a1f1a 0%, #1a1d20 100%);
+        background: linear-gradient(135deg, 
+            rgba(240,185,11,0.15) 0%, 
+            rgba(26,29,32,0.8) 100%);
         border: 2px solid #f0b90b;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 16px;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 
+            0 6px 20px rgba(240,185,11,0.25),
+            inset 0 0 30px rgba(240,185,11,0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .gold-widget::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at center, rgba(240,185,11,0.1), transparent 60%);
+        animation: rotate 15s linear infinite reverse;
+    }
+    
+    /* Навигационные кнопки */
+    .nav-button-container {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+    
+    /* Значки и иконки */
+    .icon-badge {
+        display: inline-block;
+        background: rgba(240,185,11,0.2);
+        padding: 8px 16px;
+        border-radius: 20px;
+        color: #f0b90b;
+        font-weight: 700;
+        font-size: 14px;
+        border: 1px solid rgba(240,185,11,0.3);
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    
+    /* Стили для слайдера */
+    .stSlider > div > div > div {
+        background: linear-gradient(90deg, #f0b90b, #0ecb81) !important;
+    }
+    
+    /* Улучшение sidebar */
+    [data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0e1113 0%, #0b0e11 100%);
+        border-right: 2px solid rgba(240,185,11,0.2);
+    }
+    
+    /* Разделители */
+    hr {
+        border: none;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #f0b90b, transparent);
+        margin: 24px 0;
     }
     </style>
 """, unsafe_allow_html=True)
 
 # -----------------------
-# Helpers
+# Helpers (без изменений)
 # -----------------------
 def safe_float(value):
     try:
@@ -210,7 +548,6 @@ def safe_float(value):
         return 0.0
 
 def split_modifiers(raw_text):
-    """Split modifiers cell into tokens (keeps numbers as separate tokens)."""
     if raw_text is None:
         return []
     txt = str(raw_text).strip()
@@ -281,7 +618,7 @@ def get_gspread_client():
     )
     return gspread.authorize(creds)
 
-@st.cache_data(ttl=30)
+@st.cache_data(ttl=5)
 def load_stocks_table():
     client = get_gspread_client()
     try:
@@ -292,7 +629,7 @@ def load_stocks_table():
         st.error(f"❌ Ошибка загрузки акций: {e}")
         return pd.DataFrame()
 
-@st.cache_data(ttl=30)
+@st.cache_data(ttl=5)
 def load_reference_tables():
     client = get_gspread_client()
     
@@ -363,14 +700,7 @@ def remove_stock_from_purchases_sheet(stock_name):
         return False
     return False
 
-# -----------------------
-# Strict modifier matching
-# -----------------------
 def sum_modifiers_and_list(raw_text, ref_df):
-    """
-    Strict matching using 'Тип' and 'Значение' from reference table.
-    Returns: total_pct (float), found_pairs [(display_str, pct), ...], tokens (list)
-    """
     if ref_df is None or ref_df.empty:
         return 0.0, [], []
 
@@ -493,47 +823,41 @@ st.session_state.setdefault('purchase_dialog', None)
 # -----------------------
 @st.fragment(run_every=30)
 def market_display():
-    st.markdown("<h1 style='color:#f0b90b; margin-bottom:6px; text-shadow: 0 0 20px rgba(240,185,11,0.5);'>💎 Ванина игра</h1>", unsafe_allow_html=True)
+    # Красивый заголовок с декорациями
+    st.markdown("""
+        <div class='header-container'>
+            <h1 class='main-title'>💎 ВАНИНА ИГРА 💎</h1>
+        </div>
+    """, unsafe_allow_html=True)
 
-    # -----------------------
     # Новости
-    # -----------------------
     news_list = [
-        "Рост рынка золота удивляет экспертов.",
-        "Открылся новый завод, возможно это принесет прибавку к заводским акциям.",
-        "Акции компаний резко упали.",
-        "Инвесторы прогнозируют рост цен.",
-        "Экономика рынка стабилизируется.",
-        "Новые законы могут повлиять на рынок.",
-        "Поступили данные о прибыли компаний.",
-        "Региональные акции пользуются спросом.",
-        "Инновационный проект привлёк инвестиции.",
-        "Аналитики повышают прогноз по золоту.",
-        "Волатильность на рынке выше нормы.",
-        "Слияние компаний одобрено.",
-        "Цены на ресурсы растут.",
-        "Эксперты советуют держать региональные акции.",
-        "Рынок переживает небольшую коррекцию.",
+        "Рынок золота демонстрирует стабильный рост - эксперты прогнозируют дальнейшее укрепление позиций",
+        "Новый завод открыл двери - аналитики ожидают значительный прирост к заводским акциям",
+        "Резкое падение акций технологических компаний вызвало волну беспокойства среди инвесторов",
+        "Крупные инвесторы прогнозируют масштабный рост цен на ближайший квартал",
+        "Экономика рынка стабилизируется после турбулентного периода - хорошие новости для инвесторов",
+        "Новые законодательные инициативы могут кардинально изменить расклад сил на рынке",
+        "Квартальные отчеты компаний превзошли ожидания - акционеры празднуют успех",
+        "Региональные акции набирают популярность среди опытных трейдеров",
+        "Инновационный проект привлек рекордные инвестиции в размере $500 млн",
+        "Ведущие аналитики Wall Street повышают прогнозы по золоту на следующий год",
     ]
     random_news = random.choice(news_list)
     st.markdown(
-        f"<div class='news-banner'><h3 style='color:#ccccff; margin:0;'>📰 Актуальные Новости: {random_news}</h3></div>",
+        f"<div class='news-banner'><h3 style='color:#ccccff; margin:0; font-size:16px;'>📰 <strong>НОВОСТИ РЫНКА:</strong> {random_news}</h3></div>",
         unsafe_allow_html=True
     )
 
-    # -----------------------
     # Кнопка обновить
-    # -----------------------
     col_refresh, _ = st.columns([1, 6])
     with col_refresh:
-        if st.button("🔄 Обновить"):
+        if st.button("🔄 ОБНОВИТЬ ДАННЫЕ"):
             st.cache_data.clear()
             st.cache_resource.clear()
             st.rerun()
 
-    # -----------------------
     # Обновление свечи золота
-    # -----------------------
     last_close = st.session_state.gold_history[-1]['close']
     o = last_close
     c = o + random.uniform(-15, 15)
@@ -543,14 +867,12 @@ def market_display():
     if len(st.session_state.gold_history) > 60:
         st.session_state.gold_history.pop(0)
 
-    # -----------------------
     # Загрузка данных
-    # -----------------------
     df_raw = load_stocks_table()
     df_ref_zavod, df_ref_region = load_reference_tables()
 
     if df_raw is None or df_raw.empty:
-        st.info("Нет данных таблицы «Акции».")
+        st.info("⚠️ Нет данных таблицы «Акции».")
         return
 
     df_raw.columns = [str(col).strip() for col in df_raw.columns]
@@ -562,12 +884,10 @@ def market_display():
     mod_col = find_col_in_df(df_raw, ['модифик', 'modifier'])
 
     if status_col is None:
-        st.error("В таблице «Акции» не найдена колонка со статусом.")
+        st.error("❌ В таблице «Акции» не найдена колонка со статусом.")
         return
 
-    # -----------------------
     # График золота и навигация
-    # -----------------------
     col_left, col_right = st.columns([3, 1])
     
     with col_left:
@@ -581,10 +901,10 @@ def market_display():
         
         st.markdown(f"""
             <div class='gold-widget'>
-                <h3 style='color:#f0b90b; margin:0 0 8px 0;'>🪙 Курс Золота</h3>
-                <div style='display:flex; justify-content:space-between; align-items:center;'>
-                    <div style='font-size:32px; font-weight:800; color:#f0b90b;'>{current_gold:.2f}$</div>
-                    <div style='font-size:20px; font-weight:700; color:{gold_color};'>{gold_sign}{gold_change:.2f} ({gold_sign}{gold_change_pct:.2f}%)</div>
+                <h3 style='color:#f0b90b; margin:0 0 12px 0; font-size:20px; font-weight:800; position:relative; z-index:1;'>🪙 КУРС ЗОЛОТА</h3>
+                <div style='display:flex; justify-content:space-between; align-items:center; position:relative; z-index:1;'>
+                    <div style='font-size:40px; font-weight:900; color:#f0b90b; text-shadow: 0 0 15px rgba(240,185,11,0.5);'>{current_gold:.2f}$</div>
+                    <div style='font-size:22px; font-weight:800; color:{gold_color}; text-shadow: 0 0 10px {gold_color};'>{gold_sign}{gold_change:.2f} ({gold_sign}{gold_change_pct:.2f}%)</div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -597,45 +917,49 @@ def market_display():
             close=hist_df['close'],
             increasing_line_color='#0ecb81', 
             decreasing_line_color='#f6465d',
-            increasing_fillcolor='rgba(14,203,129,0.3)',
-            decreasing_fillcolor='rgba(246,70,93,0.3)'
+            increasing_fillcolor='rgba(14,203,129,0.4)',
+            decreasing_fillcolor='rgba(246,70,93,0.4)'
         )])
         fig.update_layout(
-            height=300, 
+            height=320, 
             margin=dict(l=0, r=0, t=8, b=0), 
             xaxis_rangeslider_visible=False,
             paper_bgcolor='rgba(0,0,0,0)', 
-            plot_bgcolor='rgba(26,29,32,0.5)',
+            plot_bgcolor='rgba(26,29,32,0.6)',
             xaxis=dict(showgrid=False, showticklabels=False),
-            yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.1)')
+            yaxis=dict(showgrid=True, gridcolor='rgba(240,185,11,0.15)', gridwidth=1)
         )
         st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
     with col_right:
-        st.markdown("#### 🎯 Навигация")
-        if st.button("📊 Все акции", use_container_width=True):
+        st.markdown("#### 🎯 НАВИГАЦИЯ")
+        st.markdown("<div class='nav-button-container'>", unsafe_allow_html=True)
+        
+        if st.button("📊 ВСЕ АКЦИИ", use_container_width=True):
             st.session_state.view_mode = "all"
             st.rerun()
-        if st.button("🔥 Топ роста", use_container_width=True):
+        if st.button("🔥 ТОП-5 РОСТА", use_container_width=True):
             st.session_state.view_mode = "top"
             st.rerun()
-        if st.button("💼 Портфель", use_container_width=True):
+        if st.button("💼 ПОРТФЕЛЬ", use_container_width=True):
             st.session_state.view_mode = "portfolio"
             st.rerun()
-        st.markdown("<div class='small-muted' style='margin-top:12px; text-align:center;'>⏱️ Автообновление каждые 30 секунд</div>", unsafe_allow_html=True)
+        if st.button("📜 ИСТОРИЯ СДЕЛОК", use_container_width=True):
+            st.session_state.view_mode = "history"
+            st.rerun()
+            
+        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("<div class='small-muted' style='margin-top:16px; text-align:center; font-size:12px;'>⏱️ Автообновление<br/>каждые 30 сек</div>", unsafe_allow_html=True)
 
-    # -----------------------
     # Обработка акций
-    # -----------------------
     try:
         status_series = df_raw[status_col].astype(str).str.upper()
         open_mask = status_series.str.contains('ОТКР', regex=False)
         open_stocks = df_raw[open_mask].copy()
     except Exception:
-        st.error("Не удалось отфильтровать открытые акции.")
+        st.error("❌ Не удалось отфильтровать открытые акции.")
         return
 
-    # Вычисляем влияние золота
     gold_imp = (gold_change_pct if gold_change_pct else 0.0)
 
     processed = []
@@ -653,7 +977,6 @@ def market_display():
         raw_mod = safe_row_get(row, [mod_col] if mod_col else [], default='')
         is_zavod = "завод" in str(typ).lower()
 
-        # Объединяем справочники
         parts = []
         if df_ref_region is not None and not df_ref_region.empty:
             parts.append(df_ref_region.copy())
@@ -702,9 +1025,55 @@ def market_display():
             "final_price": final_price
         })
 
-    # -----------------------
+    # История сделок
+    if st.session_state.view_mode == "history":
+        st.markdown("## 📜 История сделок")
+        
+        if not st.session_state.user:
+            st.warning("⚠️ Войдите в профиль, чтобы просмотреть историю сделок.")
+            return
+
+        purchases = load_purchases()
+        if purchases is None or purchases.empty:
+            st.info("📭 История сделок пуста.")
+            return
+
+        header_cols = list(purchases.columns)
+        col_time = next((c for c in header_cols if any(k in c.lower() for k in ["time", "время", "дата"])), header_cols[0] if len(header_cols) >= 1 else None)
+        col_who = next((c for c in header_cols if any(k in c.lower() for k in ["who", "кто", "user"])), header_cols[1] if len(header_cols) >= 2 else None)
+        col_name = next((c for c in header_cols if any(k in c.lower() for k in ["name", "назв", "акция"])), header_cols[2] if len(header_cols) >= 3 else None)
+        col_price = next((c for c in header_cols if any(k in c.lower() for k in ["price", "цена"])), header_cols[3] if len(header_cols) >= 4 else None)
+        col_tx = next((c for c in header_cols if any(k in c.lower() for k in ["tx", "id"])), header_cols[4] if len(header_cols) >= 5 else None)
+
+        try:
+            user_purchases = purchases[purchases[col_who] == st.session_state.user].copy()
+        except:
+            user_purchases = purchases.copy()
+
+        if user_purchases.empty:
+            st.info("У вас ещё нет сделок.")
+            return
+
+        user_purchases = user_purchases.sort_values(by=col_time, ascending=False)
+
+        for idx, row in user_purchases.head(20).iterrows():
+            st.markdown(f"""
+                <div class='position-item'>
+                    <div style='display:flex; justify-content:space-between; align-items:center;'>
+                        <div>
+                            <div style='font-size:18px; font-weight:700; color:#f0b90b;'>{row[col_name]}</div>
+                            <div class='small-muted'>💰 ${safe_float(row[col_price]):,.0f} • 🕐 {row[col_time]}</div>
+                        </div>
+                        <div style='background:rgba(240,185,11,0.2); padding:6px 12px; border-radius:20px; color:#f0b90b; font-size:12px; font-weight:700;'>
+                            {row[col_tx]}
+                        </div>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+
+        return
+
     # Portfolio view
-    # -----------------------
     if st.session_state.view_mode == "portfolio":
         if not st.session_state.user:
             st.warning("⚠️ Войдите в профиль, чтобы просмотреть портфель.")
@@ -764,71 +1133,62 @@ def market_display():
         total_pnl = total_current - total_invested
         total_pnl_pct = (total_pnl / total_invested * 100) if total_invested != 0 else 0.0
 
-        st.markdown(f"<div class='portfolio-header'><h2 style='color:#f0b90b; margin:0;'>💼 Портфель — {st.session_state.user}</h2></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='portfolio-header'><h2 style='color:#f0b90b; margin:0; position:relative; z-index:1;'>💼 ПОРТФЕЛЬ — {st.session_state.user.upper()}</h2></div>", unsafe_allow_html=True)
         
         c1, c2, c3, c4 = st.columns(4)
         with c1:
-            st.markdown(f"<div class='portfolio-stat'><div class='stat-label'>💰 Инвестировано</div><div class='stat-value'>${total_invested:,.0f}</div></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='portfolio-stat'><div class='stat-label'>💰 ИНВЕСТИРОВАНО</div><div class='stat-value'>${total_invested:,.0f}</div></div>", unsafe_allow_html=True)
         with c2:
-            st.markdown(f"<div class='portfolio-stat'><div class='stat-label'>📈 Сейчас стоит</div><div class='stat-value'>${total_current:,.0f}</div></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='portfolio-stat'><div class='stat-label'>📈 ТЕКУЩАЯ СТОИМОСТЬ</div><div class='stat-value'>${total_current:,.0f}</div></div>", unsafe_allow_html=True)
         with c3:
             pnl_color = "#0ecb81" if total_pnl >= 0 else "#f6465d"
             pnl_sign = "+" if total_pnl >= 0 else ""
-            st.markdown(f"<div class='portfolio-stat'><div class='stat-label'>💎 Прибыль/Убыток</div><div class='stat-value' style='color:{pnl_color}'>{pnl_sign}${total_pnl:,.0f}</div></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='portfolio-stat'><div class='stat-label'>💎 ПРИБЫЛЬ/УБЫТОК</div><div class='stat-value' style='color:{pnl_color}'>{pnl_sign}${total_pnl:,.0f}</div></div>", unsafe_allow_html=True)
         with c4:
-            st.markdown(f"<div class='portfolio-stat'><div class='stat-label'>📊 Позиций</div><div class='stat-value'>{len(grouped)}</div></div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='portfolio-stat'><div class='stat-label'>📊 ПОЗИЦИЙ</div><div class='stat-value'>{len(grouped)}</div></div>", unsafe_allow_html=True)
 
         st.markdown("---")
-        st.markdown("### 📊 Ваши акции")
+        st.markdown("### 📊 ВАШИ АКЦИИ")
 
         for _, pos in grouped.sort_values(by='current_value', ascending=False).iterrows():
             pnl_sign = "+" if pos['pnl'] >= 0 else ""
             pnl_color = "#0ecb81" if pos['pnl'] >= 0 else "#f6465d"
             st.markdown(f"""
                 <div class='position-item'>
-                    <div style='display:flex; justify-content:space-between; margin-bottom:12px;'>
+                    <div style='display:flex; justify-content:space-between; margin-bottom:16px;'>
                         <div class='position-title'>{pos['name']}</div>
-                        <div style='background:rgba(240,185,11,0.2); padding:6px 14px; border-radius:20px; color:#f0b90b; font-weight:700;'>×{int(pos['quantity'])}</div>
+                        <div class='icon-badge'>×{int(pos['quantity'])}</div>
                     </div>
-                    <div style='display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:12px;'>
+                    <div style='display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-top:12px;'>
                         <div>
                             <div class='small-muted'>Цена покупки</div>
-                            <div style='font-size:18px; font-weight:700; color:#fff;'>${pos['avg_price']:,.0f}</div>
+                            <div style='font-size:20px; font-weight:800; color:#fff; margin-top:4px;'>${pos['avg_price']:,.0f}</div>
                         </div>
                         <div>
-                            <div class='small-muted'>Сейчас</div>
-                            <div style='font-size:18px; font-weight:700; color:#f0b90b;'>${pos['current_price']:,.0f}</div>
+                            <div class='small-muted'>Текущая цена</div>
+                            <div style='font-size:20px; font-weight:800; color:#f0b90b; margin-top:4px;'>${pos['current_price']:,.0f}</div>
                         </div>
                         <div>
-                            <div class='small-muted'>Стоимость</div>
-                            <div style='font-size:18px; font-weight:700; color:#fff;'>${pos['current_value']:,.0f}</div>
+                            <div class='small-muted'>Общая стоимость</div>
+                            <div style='font-size:20px; font-weight:800; color:#fff; margin-top:4px;'>${pos['current_value']:,.0f}</div>
                         </div>
                         <div>
                             <div class='small-muted'>P/L</div>
-                            <div style='font-size:20px; font-weight:800; color:{pnl_color};'>{pnl_sign}${abs(pos['pnl']):,.0f}</div>
+                            <div style='font-size:24px; font-weight:900; color:{pnl_color}; margin-top:4px;'>{pnl_sign}${abs(pos['pnl']):,.0f}</div>
                         </div>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
 
-        if st.checkbox("🛠️ Показать отладку"):
-            with st.expander("Найденные модификаторы / Токены / Raw"):
-                for stock_name in st.session_state.get('last_found_map', {}):
-                    mods = st.session_state['last_found_map'].get(stock_name, [])
-                    tokens = st.session_state['last_tokens_map'].get(stock_name, [])
-                    raw = st.session_state['last_raw_map'].get(stock_name, '')
-                    st.write(f"• {stock_name}: raw='{raw}' tokens={tokens} -> found={mods}")
         return
 
-    # -----------------------
-    # Top view
-    # -----------------------
+    # Top view - ТОП 5 АКЦИЙ
     if st.session_state.view_mode == "top":
-        processed = sorted(processed, key=lambda x: x['pct'], reverse=True)[:9]
+        # Сортируем по процентам от БОЛЬШЕГО к МЕНЬШЕМУ и берем первые 5
+        processed = sorted(processed, key=lambda x: x['pct'], reverse=True)[:5]
+        st.markdown("## 🔥 ТОП-5 АКЦИЙ ПО РОСТУ")
 
-    # -----------------------
     # Display stocks
-    # -----------------------
     cols = st.columns(3)
     for idx, item in enumerate(processed):
         with cols[idx % 3]:
@@ -838,16 +1198,23 @@ def market_display():
             color_cls = "pos" if pct >= 0 else "neg"
             highlight = "highlight-100" if abs(pct) > 100 else ""
 
+            # Добавляем значок позиции для топ-5
+            position_badge = ""
+            if st.session_state.view_mode == "top":
+                position_icon = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"][idx]
+                position_badge = f"<div style='position:absolute; top:12px; right:12px; font-size:28px;'>{position_icon}</div>"
+
             st.markdown(f"""
                 <div class="stock-card {highlight}">
+                    {position_badge}
                     <div class="stock-header">
-                        <div>
+                        <div style='width:100%;'>
                             <div class="stock-name">{item['Название']}</div>
                             <div class="stock-type">{item['Тип']}</div>
                         </div>
                     </div>
                     <div style='margin-top:auto;'>
-                        <div style='display:flex; justify-content:space-between; align-items:flex-end;'>
+                        <div style='display:flex; justify-content:space-between; align-items:flex-end; margin-top:16px;'>
                             <div>
                                 <div class="old-price">{item['Базовая цена']:.0f}$</div>
                                 <div class="current-price">{item['final_price']}$</div>
@@ -871,21 +1238,21 @@ def market_display():
                         }
                         st.rerun()
 
-    # -----------------------
     # Purchase dialog
-    # -----------------------
     if st.session_state.purchase_dialog:
         dialog_data = st.session_state.purchase_dialog
         st.markdown("<div class='purchase-dialog'>", unsafe_allow_html=True)
-        st.markdown(f"## 💰 Покупка: **{dialog_data['stock_name']}**")
-        st.markdown(f"### Цена за акцию: **${dialog_data['price']:,.0f}**")
+        st.markdown(f"## 💰 ПОКУПКА АКЦИЙ")
+        st.markdown(f"### 📊 {dialog_data['stock_name']}")
+        st.markdown(f"<div style='text-align:center; font-size:24px; color:#fff; margin:12px 0;'>Цена за 1 акцию: <span style='color:#f0b90b; font-weight:900;'>${dialog_data['price']:,.0f}</span></div>", unsafe_allow_html=True)
+        
         quantity = st.slider("Количество акций:", min_value=1, max_value=100, value=1, step=1, key="quantity_slider")
         total_price = quantity * dialog_data['price']
-        st.markdown(f"<div class='total-price'>💎 ИТОГО: ${total_price:,.0f}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='total-price'>💎 ИТОГО К ОПЛАТЕ: ${total_price:,.0f}</div>", unsafe_allow_html=True)
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("✅ ПОДТВЕРДИТЕ ПОКУПКУ", use_container_width=True):
+            if st.button("✅ ПОДТВЕРДИТЬ ПОКУПКУ", use_container_width=True):
                 ws = get_buy_worksheet()
                 if ws is None:
                     st.error("❌ Ошибка подключения к таблице покупок.")
@@ -901,7 +1268,7 @@ def market_display():
                                 tx_id
                             ])
                         load_purchases.clear()
-                        st.success(f"✅ Успешно! Куплено {quantity} акций за ${total_price:,.0f}!")
+                        st.success(f"✅ УСПЕШНО! Куплено {quantity} акций за ${total_price:,.0f}!")
                         st.session_state.purchase_dialog = None
                         st.rerun()
                     except Exception as e:
@@ -912,11 +1279,9 @@ def market_display():
                 st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # -----------------------
     # Debug panel
-    # -----------------------
     if st.session_state.get('last_found_map'):
-        with st.expander("🛠️ Отладка модификаторов"):
+        with st.expander("🛠️ ПАНЕЛЬ ОТЛАДКИ"):
             for stock_name, mods in st.session_state['last_found_map'].items():
                 if mods:
                     formatted = ", ".join([f"{m[0]} ({m[1]}%)" for m in mods])
@@ -924,24 +1289,22 @@ def market_display():
                 else:
                     st.write(f"• **{stock_name}**: нет модификаторов")
 
-# -----------------------
 # Sidebar
-# -----------------------
 with st.sidebar:
-    st.markdown("# 👤 Профиль")
+    st.markdown("# 👤 ПРОФИЛЬ")
     
     if not st.session_state.user:
-        st.markdown("### Войдите в систему")
+        st.markdown("### 🔐 Вход в систему")
         u = st.selectbox("Выберите пользователя:", ["артем", "богдан", "руслан", "разработчик"])
-        if st.button("🔐 Войти", use_container_width=True):
+        if st.button("🚀 ВОЙТИ", use_container_width=True):
             st.session_state.user = u
-            st.success(f"Добро пожаловать, {u}!")
+            st.success(f"Добро пожаловать, {u.upper()}!")
             st.rerun()
     else:
-        st.markdown(f"### Привет, **{st.session_state.user}**! 👋")
-        st.markdown("---")
+        st.markdown(f"### Привет, **{st.session_state.user.upper()}**! 👋")
+        st.markdown("<hr>", unsafe_allow_html=True)
         
-        # Показываем краткую статистику из портфеля
+        # Статистика
         purchases = load_purchases()
         if not purchases.empty:
             try:
@@ -952,27 +1315,34 @@ with st.sidebar:
                 user_purchases = purchases[purchases[col_who] == st.session_state.user]
                 if not user_purchases.empty:
                     total_invested = user_purchases[col_price].apply(safe_float).sum()
-                    st.markdown(f"**💰 Инвестировано:** ${total_invested:,.0f}")
-                    st.markdown(f"**📊 Покупок:** {len(user_purchases)}")
+                    st.markdown(f"""
+                        <div style='background:rgba(240,185,11,0.1); padding:16px; border-radius:8px; border:1px solid rgba(240,185,11,0.3); margin-bottom:12px;'>
+                            <div style='font-size:12px; color:#9aa0a6; margin-bottom:6px;'>💰 ИНВЕСТИРОВАНО</div>
+                            <div style='font-size:24px; font-weight:900; color:#f0b90b;'>${total_invested:,.0f}</div>
+                            <div style='font-size:12px; color:#9aa0a6; margin-top:6px;'>📊 Сделок: {len(user_purchases)}</div>
+                        </div>
+                    """, unsafe_allow_html=True)
             except:
                 pass
         
-        st.markdown("---")
-        if st.button("🚪 Выйти", use_container_width=True):
+        st.markdown("<hr>", unsafe_allow_html=True)
+        if st.button("🚪 ВЫЙТИ", use_container_width=True):
             st.session_state.user = None
             st.rerun()
     
-    st.markdown("---")
-    st.markdown("### ℹ️ Информация")
+    st.markdown("<hr>", unsafe_allow_html=True)
+    st.markdown("### ℹ️ О СИСТЕМЕ")
     st.markdown("""
-    **Ванина игра** - это симулятор торговли акциями с реальной интеграцией Google Sheets.
+    **ВАНИНА ИГРА** — профессиональный симулятор торговли акциями
     
-    🔄 Автообновление каждые 30 секунд  
-    📊 Реалтайм данные  
-    💎 Влияние золота на региональные акции  
+    ✨ **Возможности:**
+    - 🔄 Реалтайм обновление
+    - 📊 Интеграция с Google Sheets
+    - 💎 Влияние золота на цены
+    - 📈 Детальная аналитика
+    - 🎯 История всех сделок
+    
+    ⏱️ Данные обновляются каждые 30 секунд
     """)
 
-# -----------------------
-# Run main display
-# -----------------------
 market_display()
