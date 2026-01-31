@@ -124,15 +124,23 @@ def safe_row_get(row, candidates, default=""):
 # -----------------------
 @st.cache_resource
 def get_gspread_client():
-    scope = [
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive",
-    ]
-    creds = ServiceAccountCredentials.from_json_keyfile_dict(
-        st.secrets["gcp_service_account"],
-        scope
-    )
-    return gspread.authorize(creds)
+    try:
+        scope = [
+            "https://www.googleapis.com/auth/spreadsheets",
+            "https://www.googleapis.com/auth/drive",
+        ]
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(
+            st.secrets["gcp_service_account"],
+            scope
+        )
+        client = gspread.authorize(creds)
+        # Проверка подключения
+        client.openall()
+        st.sidebar.success("✅ Подключение к Google Sheets установлено")
+        return client
+    except Exception as e:
+        st.sidebar.error(f"❌ Ошибка авторизации: {e}")
+        raise
 
 @st.cache_data(ttl=5)
 def load_reference_tables():
@@ -165,10 +173,20 @@ def load_reference_tables():
 def load_stocks_table():
     client = get_gspread_client()
     try:
-        return pd.DataFrame(
-            client.open("Акции").worksheet("Лист1").get_all_records()
-        )
-    except Exception:
+        sheet = client.open("Акции")
+        worksheet = sheet.worksheet("Лист1")
+        data = worksheet.get_all_records()
+        df = pd.DataFrame(data)
+        st.success(f"✅ Загружено {len(df)} строк из таблицы 'Акции'")
+        return df
+    except Exception as e:
+        st.error(f"❌ Ошибка загрузки таблицы 'Акции': {type(e).__name__}: {str(e)}")
+        # Показываем доступные таблицы
+        try:
+            all_sheets = client.openall()
+            st.warning(f"Доступные таблицы: {[s.title for s in all_sheets]}")
+        except:
+            pass
         return pd.DataFrame()
 
 
@@ -366,6 +384,24 @@ st.session_state.setdefault('purchase_dialog', None)
 # -----------------------
 @st.fragment(run_every=30)
 def market_display():
+    # Диагностика подключения
+with st.expander("🔍 Диагностика подключения", expanded=True):
+    try:
+        client = get_gspread_client()
+        st.write("✅ Клиент создан")
+        
+        sheets = client.openall()
+        st.write(f"✅ Доступно таблиц: {len(sheets)}")
+        st.write("Список таблиц:", [s.title for s in sheets])
+        
+        target_sheet = client.open("Акции")
+        st.write(f"✅ Таблица 'Акции' найдена")
+        
+        worksheets = target_sheet.worksheets()
+        st.write(f"Листы в таблице: {[w.title for w in worksheets]}")
+        
+    except Exception as e:
+        st.error(f"❌ Ошибка: {type(e).__name__}: {str(e)}")
     st.markdown("<h1 style='color:#f0b90b; margin-bottom:6px;'>Ванина игра</h1>", unsafe_allow_html=True)
 
     # -----------------------
@@ -786,6 +822,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
