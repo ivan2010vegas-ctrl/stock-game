@@ -1150,11 +1150,11 @@ def market_display():
         st.markdown("---")
         st.markdown("### 📊 ВАШИ АКЦИИ")
 
-for _, pos in grouped.sort_values(by='current_value', ascending=False).iterrows():
+for _, pos in grouped_sorted.iterrows():
             pnl_sign = "+" if pos['pnl'] >= 0 else ""
             pnl_color = "#0ecb81" if pos['pnl'] >= 0 else "#f6465d"
             
-            # ВАЖНО: Весь HTML ниже прижат к левому краю, чтобы не отображался как код
+            # HTML без внутренних отступов (прижат влево)
             st.markdown(f"""<div class='position-item'>
 <div style='display:flex; justify-content:space-between; margin-bottom:16px;'>
 <div class='position-title'>{pos['name']}</div>
@@ -1180,6 +1180,7 @@ for _, pos in grouped.sort_values(by='current_value', ascending=False).iterrows(
 </div>
 </div>""", unsafe_allow_html=True)
 
+        # Этот return теперь стоит правильно
         return
 
     # Top view - ТОП 5 АКЦИЙ
@@ -1349,4 +1350,5 @@ with st.sidebar:
     """)
 
 market_display()
+
 
