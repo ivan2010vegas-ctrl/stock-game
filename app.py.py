@@ -1181,7 +1181,7 @@ for _, pos in grouped_sorted.iterrows():
 </div>""", unsafe_allow_html=True)
 
         # Этот return теперь стоит правильно
- return
+return
 
     # Top view - ТОП 5 АКЦИЙ
     if st.session_state.view_mode == "top":
@@ -1350,6 +1350,7 @@ with st.sidebar:
     """)
 
 market_display()
+
 
 
 
