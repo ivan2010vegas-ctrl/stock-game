@@ -470,10 +470,10 @@ def market_display():
         df_ref_zavod, df_ref_region = load_reference_tables()
     except FileNotFoundError as fe:
         st.error(f"Ошибка авторизации Google API: {fe}")
-        return
+    else:
     except Exception as e:
         st.error(f"Ошибка при загрузке данных: {e}")
-        return
+    else:
 
     status_col = find_col_in_df(df_raw, ['Статус', 'status'])
     name_col = find_col_in_df(df_raw, ['назв', 'name'])
@@ -483,7 +483,7 @@ def market_display():
 
     if status_col is None:
         st.error("В таблице «Акции» не найдена колонка со статусом.")
-        return
+    else:
 
     col_left, col_right = st.columns([3, 1])
     with col_left:
@@ -520,7 +520,7 @@ def market_display():
 
     if df_raw is None or df_raw.empty:
         st.info("Нет данных таблицы «Акции».")
-        return
+    else:
 
     try:
         status_series = df_raw[status_col].astype(str).str.upper()
@@ -620,13 +620,13 @@ for i, row in open_stocks.iterrows():
     # Portfolio view
     if st.session_state.view_mode == "portfolio":
         if not st.session_state.user:
-            st.warning("Войдите в профиль, чтобы просмотреть портфель.")
-            return
+        st.warning("Войдите в профиль, чтобы просмотреть портфель.")
+    else:
 
         purchases = load_purchases()
         if purchases is None or purchases.empty:
             st.info("Портфель пуст.")
-            return
+        else:
 
         header_cols = list(purchases.columns)
         col_time = col_who = col_name = col_price = col_tx = None
@@ -657,7 +657,7 @@ for i, row in open_stocks.iterrows():
 
         if user_purchases.empty:
             st.info("У вас ещё нет покупок.")
-            return
+        else:
 
         user_purchases['_price_'] = user_purchases[col_price].apply(safe_float)
         grouped = user_purchases.groupby(col_name).agg(
@@ -717,7 +717,7 @@ for i, row in open_stocks.iterrows():
                     tokens = st.session_state['last_tokens_map'].get(stock_name, [])
                     raw = st.session_state['last_raw_map'].get(stock_name, '')
                     st.write(f"• {stock_name}: raw='{raw}' tokens={tokens} -> found={mods}")
-        return
+        else:
 
     if st.session_state.view_mode == "top":
         processed = sorted(processed, key=lambda x: x['pct'], reverse=True)[:9]
@@ -828,6 +828,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
