@@ -1349,7 +1349,3 @@ with st.sidebar:
     """)
 
 market_display()
-
-
-
-
