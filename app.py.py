@@ -370,25 +370,7 @@ st.session_state.setdefault('purchase_dialog', None)
 def market_display():
     st.markdown("<h1 style='color:#f0b90b; margin-bottom:6px;'>Ванина игра</h1>", unsafe_allow_html=True)
     
-    # ========== ДИАГНОСТИКА (добавьте сразу после заголовка) ==========
-    with st.expander("🔍 Диагностика подключения", expanded=True):
-        try:
-            client = get_gspread_client()
-            st.write("✅ Клиент создан")
-            
-            sheets = client.openall()
-            st.write(f"✅ Доступно таблиц: {len(sheets)}")
-            st.write("Список таблиц:", [s.title for s in sheets])
-            
-            target_sheet = client.open("Акции")
-            st.write(f"✅ Таблица 'Акции' найдена")
-            
-            worksheets = target_sheet.worksheets()
-            st.write(f"Листы в таблице: {[w.title for w in worksheets]}")
-            
-        except Exception as e:
-            st.error(f"❌ Ошибка: {type(e).__name__}: {str(e)}")
-    # ========== КОНЕЦ ДИАГНОСТИКИ ==========
+    
 
     # -----------------------
     # Новости
@@ -468,11 +450,6 @@ with col_refresh:
 
     # -----------------------
     # Остальной код (графики, акции, портфель)
-    # -----------------------
-
-
-    # -----------------------
-    # market_display...
 
 
 
@@ -569,10 +546,6 @@ for i, row in open_stocks.iterrows():
     
     # --- Статус для этой строки ---
     status_value = row[status_col]
-    
-    # ... остальной код цикла
-
-    # --- Здесь можно дальше обрабатывать акции, модификаторы и т.д. ---
 
 
     # Ищем модификаторы во ВСЕХ справочниках (региональный + заводской)
@@ -838,6 +811,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
