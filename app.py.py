@@ -860,7 +860,7 @@ def market_display():
 
             btn_col1, btn_col2, btn_col3 = st.columns([1, 2, 1])
             with btn_col2:
-                if st.button("🛒 купить", key=f"buy_{item['Название']}_{idx}", use_container_width=True):
+                if st.button("🛒 КУПИТЬ", key=f"buy_{item['Название']}_{idx}", use_container_width=True):
                     if not st.session_state.user:
                         st.error("⚠️ Войдите в профиль!")
                     else:
@@ -885,7 +885,7 @@ def market_display():
         
         col1, col2 = st.columns(2)
         with col1:
-            if st.button("✅ Подтвердить покупку", use_container_width=True):
+            if st.button("✅ ПОДТВЕРДИТЕ ПОКУПКУ", use_container_width=True):
                 ws = get_buy_worksheet()
                 if ws is None:
                     st.error("❌ Ошибка подключения к таблице покупок.")
@@ -907,7 +907,7 @@ def market_display():
                     except Exception as e:
                         st.error(f"❌ Ошибка при покупке: {e}")
         with col2:
-            if st.button("❌ Отмена", use_container_width=True):
+            if st.button("❌ ОТМЕНА", use_container_width=True):
                 st.session_state.purchase_dialog = None
                 st.rerun()
         st.markdown("</div>", unsafe_allow_html=True)
@@ -976,4 +976,5 @@ with st.sidebar:
 # Run main display
 # -----------------------
 market_display()
+
 
