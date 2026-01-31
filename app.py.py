@@ -612,19 +612,20 @@ for i, row in open_stocks.iterrows():
             "final_price": final_price
         })
 
-    # Portfolio view
-    if st.session_state.view_mode == "portfolio":
-        if not st.session_state.user:
+# Portfolio view
+if st.session_state.view_mode == "portfolio":
+    if not st.session_state.user:
         st.warning("Войдите в профиль, чтобы просмотреть портфель.")
+        st.stop()  # останавливаем выполнение блока, если пользователь не вошёл
     else:
-
         purchases = load_purchases()
         if purchases is None or purchases.empty:
             st.info("Портфель пуст.")
         else:
+            header_cols = list(purchases.columns)
+            col_time = col_who = col_name = col_price = col_tx = None
+            # дальше идёт код для отображения портфеля
 
-        header_cols = list(purchases.columns)
-        col_time = col_who = col_name = col_price = col_tx = None
 
         for c in header_cols:
             lc = c.lower()
@@ -823,6 +824,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
