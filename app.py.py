@@ -281,7 +281,7 @@ def get_gspread_client():
     )
     return gspread.authorize(creds)
 
-@st.cache_data(ttl=5)
+@st.cache_data(ttl=30)
 def load_stocks_table():
     client = get_gspread_client()
     try:
@@ -292,7 +292,7 @@ def load_stocks_table():
         st.error(f"❌ Ошибка загрузки акций: {e}")
         return pd.DataFrame()
 
-@st.cache_data(ttl=5)
+@st.cache_data(ttl=30)
 def load_reference_tables():
     client = get_gspread_client()
     
@@ -976,3 +976,4 @@ with st.sidebar:
 # Run main display
 # -----------------------
 market_display()
+
