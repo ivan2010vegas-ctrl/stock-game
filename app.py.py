@@ -1183,13 +1183,13 @@ for _, pos in grouped_sorted.iterrows():
         # Этот return теперь стоит правильно
 return
 
-    # Top view - ТОП 5 АКЦИЙ
+# Top view - ТОП 5 АКЦИЙ
     if st.session_state.view_mode == "top":
         # Сортируем по процентам от БОЛЬШЕГО к МЕНЬШЕМУ и берем первые 5
         processed = sorted(processed, key=lambda x: x['pct'], reverse=True)[:5]
         st.markdown("## 🔥 ТОП-5 АКЦИЙ ПО РОСТУ")
 
-# Отрисовка акций
+    # Отрисовка акций
     cols = st.columns(3)
     for idx, item in enumerate(processed):
         with cols[idx % 3]:
@@ -1205,7 +1205,7 @@ return
                 position_icon = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"][idx]
                 position_badge = f"<div style='position:absolute; top:12px; right:12px; font-size:28px; z-index:10;'>{position_icon}</div>"
 
-            # ВНИМАНИЕ: Строки ниже прижаты влево специально! Не добавляй отступы внутрь HTML!
+            # ВАЖНО: HTML внутри f-строки ПРИЖАТ ВЛЕВО, чтобы не было рамки "кода"
             stock_html = f"""<div class="stock-card {highlight}" style="position:relative;">
 {position_badge}
 <div class="stock-header">
@@ -1224,11 +1224,10 @@ return
 </div>
 </div>
 </div>"""
-
-            # Вывод карточки
+            
             st.markdown(stock_html, unsafe_allow_html=True)
 
-            # Кнопки
+            # Кнопка покупки (выровнена по сетке Streamlit)
             btn_col1, btn_col2, btn_col3 = st.columns([1, 2, 1])
             with btn_col2:
                 if st.button("🛒 КУПИТЬ", key=f"buy_{item['Название']}_{idx}", use_container_width=True):
@@ -1350,6 +1349,7 @@ with st.sidebar:
     """)
 
 market_display()
+
 
 
 
