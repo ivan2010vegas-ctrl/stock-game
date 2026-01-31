@@ -1150,46 +1150,45 @@ def market_display():
         st.markdown("---")
         st.markdown("### 📊 ВАШИ АКЦИИ")
 
-for _, pos in grouped_sorted.iterrows():
+        for _, pos in grouped.sort_values(by='current_value', ascending=False).iterrows():
             pnl_sign = "+" if pos['pnl'] >= 0 else ""
             pnl_color = "#0ecb81" if pos['pnl'] >= 0 else "#f6465d"
-            
-            # HTML без внутренних отступов (прижат влево)
-            st.markdown(f"""<div class='position-item'>
-<div style='display:flex; justify-content:space-between; margin-bottom:16px;'>
-<div class='position-title'>{pos['name']}</div>
-<div class='icon-badge'>×{int(pos['quantity'])}</div>
-</div>
-<div style='display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-top:12px;'>
-<div>
-<div class='small-muted'>Цена покупки</div>
-<div style='font-size:20px; font-weight:800; color:#fff; margin-top:4px;'>${pos['avg_price']:,.0f}</div>
-</div>
-<div>
-<div class='small-muted'>Текущая цена</div>
-<div style='font-size:20px; font-weight:800; color:#f0b90b; margin-top:4px;'>${pos['current_price']:,.0f}</div>
-</div>
-<div>
-<div class='small-muted'>Общая стоимость</div>
-<div style='font-size:20px; font-weight:800; color:#fff; margin-top:4px;'>${pos['current_value']:,.0f}</div>
-</div>
-<div>
-<div class='small-muted'>P/L</div>
-<div style='font-size:24px; font-weight:900; color:{pnl_color}; margin-top:4px;'>{pnl_sign}${abs(pos['pnl']):,.0f}</div>
-</div>
-</div>
-</div>""", unsafe_allow_html=True)
+            st.markdown(f"""
+                <div class='position-item'>
+                    <div style='display:flex; justify-content:space-between; margin-bottom:16px;'>
+                        <div class='position-title'>{pos['name']}</div>
+                        <div class='icon-badge'>×{int(pos['quantity'])}</div>
+                    </div>
+                    <div style='display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-top:12px;'>
+                        <div>
+                            <div class='small-muted'>Цена покупки</div>
+                            <div style='font-size:20px; font-weight:800; color:#fff; margin-top:4px;'>${pos['avg_price']:,.0f}</div>
+                        </div>
+                        <div>
+                            <div class='small-muted'>Текущая цена</div>
+                            <div style='font-size:20px; font-weight:800; color:#f0b90b; margin-top:4px;'>${pos['current_price']:,.0f}</div>
+                        </div>
+                        <div>
+                            <div class='small-muted'>Общая стоимость</div>
+                            <div style='font-size:20px; font-weight:800; color:#fff; margin-top:4px;'>${pos['current_value']:,.0f}</div>
+                        </div>
+                        <div>
+                            <div class='small-muted'>P/L</div>
+                            <div style='font-size:24px; font-weight:900; color:{pnl_color}; margin-top:4px;'>{pnl_sign}${abs(pos['pnl']):,.0f}</div>
+                        </div>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
 
-        # Этот return теперь стоит правильно
-return
+        return
 
-# Top view - ТОП 5 АКЦИЙ
+    # Top view - ТОП 5 АКЦИЙ
     if st.session_state.view_mode == "top":
         # Сортируем по процентам от БОЛЬШЕГО к МЕНЬШЕМУ и берем первые 5
         processed = sorted(processed, key=lambda x: x['pct'], reverse=True)[:5]
         st.markdown("## 🔥 ТОП-5 АКЦИЙ ПО РОСТУ")
 
-    # Отрисовка акций
+# Отрисовка акций
     cols = st.columns(3)
     for idx, item in enumerate(processed):
         with cols[idx % 3]:
@@ -1205,7 +1204,7 @@ return
                 position_icon = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"][idx]
                 position_badge = f"<div style='position:absolute; top:12px; right:12px; font-size:28px; z-index:10;'>{position_icon}</div>"
 
-            # ВАЖНО: HTML внутри f-строки ПРИЖАТ ВЛЕВО, чтобы не было рамки "кода"
+            # ВНИМАНИЕ: Строки ниже прижаты влево специально! Не добавляй отступы внутрь HTML!
             stock_html = f"""<div class="stock-card {highlight}" style="position:relative;">
 {position_badge}
 <div class="stock-header">
@@ -1224,10 +1223,11 @@ return
 </div>
 </div>
 </div>"""
-            
+
+            # Вывод карточки
             st.markdown(stock_html, unsafe_allow_html=True)
 
-            # Кнопка покупки (выровнена по сетке Streamlit)
+            # Кнопки
             btn_col1, btn_col2, btn_col3 = st.columns([1, 2, 1])
             with btn_col2:
                 if st.button("🛒 КУПИТЬ", key=f"buy_{item['Название']}_{idx}", use_container_width=True):
@@ -1349,6 +1349,40 @@ with st.sidebar:
     """)
 
 market_display()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
