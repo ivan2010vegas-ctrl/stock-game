@@ -524,18 +524,33 @@ if df_raw is None or df_raw.empty:
     st.info("Нет данных таблицы «Акции».")
     st.stop()
 
-# --- Очистка названий колонок ---
-df_raw.columns = [col.strip() for col in df_raw.columns]
+# --- ВАЖНО: Очистка названий колонок от пробелов ---
+df_raw.columns = [str(col).strip() for col in df_raw.columns]
+
+# --- ОТЛАДКА: покажите реальные названия колонок ---
+with st.expander("🔍 DEBUG: Колонки таблицы", expanded=True):
+    st.write("Найденные колонки:", list(df_raw.columns))
+    st.write("Первая строка:", df_raw.iloc[0].to_dict() if len(df_raw) > 0 else "Нет данных")
 
 # --- Определяем нужные колонки ---
-status_col = find_col_in_df(df_raw, ['Статус', 'status'])
+status_col = find_col_in_df(df_raw, ['статус', 'status'])
 name_col = find_col_in_df(df_raw, ['назв', 'name'])
 type_col = find_col_in_df(df_raw, ['тип', 'type'])
 base_price_col = find_col_in_df(df_raw, ['баз', 'price', 'цена', 'cost'])
 mod_col = find_col_in_df(df_raw, ['модифик', 'modifier'])
 
+# --- DEBUG: показать найденные колонки ---
+st.write("DEBUG найденные колонки:", {
+    'status': status_col,
+    'name': name_col, 
+    'type': type_col,
+    'base_price': base_price_col,
+    'mod': mod_col
+})
+
 if status_col is None:
     st.error("В таблице «Акции» не найдена колонка со статусом.")
+    st.write("Попробуйте переименовать колонку F в 'Статус' (без пробелов)")
     st.stop()
 
 # --- Фильтруем открытые акции ---
@@ -826,6 +841,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
