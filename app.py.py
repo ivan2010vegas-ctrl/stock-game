@@ -475,7 +475,7 @@ def market_display():
         st.error(f"Ошибка при загрузке данных: {e}")
         return
 
-    status_col = find_col_in_df(df_raw, ['статус', 'status'])
+    status_col = find_col_in_df(df_raw, ['Статус', 'status'])
     name_col = find_col_in_df(df_raw, ['назв', 'name'])
     type_col = find_col_in_df(df_raw, ['тип', 'type'])
     base_price_col = find_col_in_df(df_raw, ['баз', 'price', 'цена', 'cost'])
@@ -801,4 +801,5 @@ with st.sidebar:
 
 
 market_display()
+
 
