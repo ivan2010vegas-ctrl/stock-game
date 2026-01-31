@@ -122,26 +122,6 @@ def safe_row_get(row, candidates, default=""):
 # -----------------------
 # Google Sheets helpers
 # -----------------------
-@st.cache_resource
-def get_gspread_client():
-    try:
-        scope = [
-            "https://www.googleapis.com/auth/spreadsheets",
-            "https://www.googleapis.com/auth/drive",
-        ]
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(
-            st.secrets["gcp_service_account"],
-            scope
-        )
-        client = gspread.authorize(creds)
-        # Проверка подключения
-        client.openall()
-        st.sidebar.success("✅ Подключение к Google Sheets установлено")
-        return client
-    except Exception as e:
-        st.sidebar.error(f"❌ Ошибка авторизации: {e}")
-        raise
-
 @st.cache_data(ttl=5)
 def load_stocks_table():
     client = get_gspread_client()
@@ -149,10 +129,9 @@ def load_stocks_table():
         df = pd.DataFrame(
             client.open("«Акции»").worksheet("Лист1").get_all_records()
         )
-        st.sidebar.success(f"✅ Акции: {len(df)} строк")
         return df
     except Exception as e:
-        st.sidebar.error(f"❌ Акции: {e}")
+        st.error(f"❌ Ошибка загрузки акций: {e}")
         return pd.DataFrame()
 
 
@@ -160,26 +139,22 @@ def load_stocks_table():
 def load_reference_tables():
     client = get_gspread_client()
     
-    # Заводские модификаторы
     try:
         df_zavod = pd.DataFrame(
             client.open("«Таблица дификаторы_заводские_проценты»")
             .sheet1.get_all_records()
         )
-        st.sidebar.success(f"✅ Заводские: {len(df_zavod)} строк")
     except Exception as e:
-        st.sidebar.error(f"❌ Заводские: {e}")
+        st.warning(f"⚠️ Заводские модификаторы: {e}")
         df_zavod = pd.DataFrame(columns=["Значение", "%"])
 
-    # Региональные модификаторы
     try:
         df_region = pd.DataFrame(
             client.open("Таблица «Модификаторы_региональные_проценты»")
             .sheet1.get_all_records()
         )
-        st.sidebar.success(f"✅ Региональные: {len(df_region)} строк")
     except Exception as e:
-        st.sidebar.error(f"❌ Региональные: {e}")
+        st.warning(f"⚠️ Региональные модификаторы: {e}")
         df_region = pd.DataFrame(columns=["Значение", "%"])
 
     return df_zavod, df_region
@@ -189,11 +164,8 @@ def load_reference_tables():
 def get_buy_worksheet():
     client = get_gspread_client()
     try:
-        ws = client.open("Таблица «Покупки»").worksheet("Лист6")
-        st.sidebar.success("✅ Покупки подключены")
-        return ws
-    except Exception as e:
-        st.sidebar.error(f"❌ Покупки: {e}")
+        return client.open("Таблица «Покупки»").worksheet("Лист6")
+    except Exception:
         return None
 
 
@@ -202,12 +174,23 @@ def load_purchases():
     client = get_gspread_client()
     try:
         ws = client.open("Таблица «Покупки»").worksheet("Лист6")
-        df = pd.DataFrame(ws.get_all_records())
-        st.sidebar.success(f"✅ Покупки: {len(df)} записей")
-        return df
+        return pd.DataFrame(ws.get_all_records())
     except Exception as e:
-        st.sidebar.error(f"❌ Покупки: {e}")
+        st.warning(f"⚠️ Покупки: {e}")
         return pd.DataFrame(columns=["time", "who", "name", "price", "tx_id"])
+
+
+@st.cache_resource
+def get_gspread_client():
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive",
+    ]
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(
+        st.secrets["gcp_service_account"],
+        scope
+    )
+    return gspread.authorize(creds)
 
 
 def remove_stock_from_purchases_sheet(stock_name):
@@ -855,6 +838,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
