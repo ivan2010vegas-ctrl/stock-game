@@ -517,7 +517,6 @@ def market_display():
 
     if df_raw is None or df_raw.empty:
         st.info("Нет данных таблицы «Акции».")
-    else:
 
     try:
         status_series = df_raw[status_col].astype(str).str.upper()
@@ -525,7 +524,6 @@ def market_display():
         open_stocks = df_raw[open_mask].copy()
     except Exception:
         st.error("Не удалось отфильтровать открытые акции.")
-        return
 
     for i, row in open_stocks.iterrows():
         name = safe_row_get(row, [name_col] if name_col else [], default=f'#{i}')
@@ -825,6 +823,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
