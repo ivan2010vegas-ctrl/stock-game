@@ -470,10 +470,8 @@ def market_display():
         df_ref_zavod, df_ref_region = load_reference_tables()
     except FileNotFoundError as fe:
         st.error(f"Ошибка авторизации Google API: {fe}")
-    else:
     except Exception as e:
         st.error(f"Ошибка при загрузке данных: {e}")
-    else:
 
     status_col = find_col_in_df(df_raw, ['Статус', 'status'])
     name_col = find_col_in_df(df_raw, ['назв', 'name'])
@@ -483,7 +481,6 @@ def market_display():
 
     if status_col is None:
         st.error("В таблице «Акции» не найдена колонка со статусом.")
-    else:
 
     col_left, col_right = st.columns([3, 1])
     with col_left:
@@ -828,6 +825,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
