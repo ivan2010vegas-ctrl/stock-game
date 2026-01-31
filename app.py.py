@@ -464,90 +464,50 @@ def market_display():
     if len(st.session_state.gold_history) > 60:
         st.session_state.gold_history.pop(0)
 
-    # load tables
-    try:
-        df_raw = load_stocks_table()
-        df_ref_zavod, df_ref_region = load_reference_tables()
-    except FileNotFoundError as fe:
-        st.error(f"Ошибка авторизации Google API: {fe}")
-    except Exception as e:
-        st.error(f"Ошибка при загрузке данных: {e}")
-
-    status_col = find_col_in_df(df_raw, ['Статус', 'status'])
-    name_col = find_col_in_df(df_raw, ['назв', 'name'])
-    type_col = find_col_in_df(df_raw, ['тип', 'type'])
-    base_price_col = find_col_in_df(df_raw, ['баз', 'price', 'цена', 'cost'])
-    mod_col = find_col_in_df(df_raw, ['модифик', 'modifier'])
-
-    if status_col is None:
-        st.error("В таблице «Акции» не найдена колонка со статусом.")
-
-    col_left, col_right = st.columns([3, 1])
-    with col_left:
-        current_gold = st.session_state.gold_history[-1]['close']
-        gold_imp = ((current_gold - 1200.0) / 1200.0) * 100.0
-        st.markdown(f"### 🪙 Курс Золота: {current_gold:.2f}$")
-        hist_df = pd.DataFrame(st.session_state.gold_history)
-        fig = go.Figure(data=[go.Candlestick(
-            open=hist_df['open'], high=hist_df['high'], low=hist_df['low'], close=hist_df['close'],
-            increasing_line_color='#0ecb81', decreasing_line_color='#f6465d'
-        )])
-        fig.update_layout(height=300, margin=dict(l=0, r=0, t=8, b=0), xaxis_rangeslider_visible=False,
-                          paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', xaxis_visible=False)
-        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-
-    with col_right:
-        st.markdown("#### Навигация")
-        if st.button("Все акции"):
-            st.session_state.view_mode = "all"
-            st.rerun()
-        if st.button("Топ роста"):
-            st.session_state.view_mode = "top"
-            st.rerun()
-        if st.button("Портфель"):
-            st.session_state.view_mode = "portfolio"
-            st.rerun()
-        st.markdown("<div class='small-muted' style='margin-top:8px'>Автообновление каждые 30 секунд</div>", unsafe_allow_html=True)
-
-    processed = []
-    removed_stock_names = set()
-    st.session_state['last_found_map'] = {}
-    st.session_state['last_tokens_map'] = {}
-    st.session_state['last_raw_map'] = {}
-
-    if df_raw is None or df_raw.empty:
-        st.info("Нет данных таблицы «Акции».")
-
-    try:
-        status_series = df_raw[status_col].astype(str).str.upper()
-        open_mask = status_series.str.contains('ОТКР', regex=False)
-        open_stocks = df_raw[open_mask].copy()
-    except Exception:
-        st.error("Не удалось отфильтровать открытые акции.")
-
-    for i, row in open_stocks.iterrows():
-        name = safe_row_get(row, [name_col] if name_col else [], default=f'#{i}')
-        if not name:
-            name = f'#{i}'
-        typ = safe_row_get(row, [type_col] if type_col else [], default='')
-        base_price = safe_float(safe_row_get(row, [base_price_col] if base_price_col else [], default=0))
-        raw_mod = safe_row_get(row, [mod_col] if mod_col else [], default='')
-
-        is_zavod = "завод" in str(typ).lower()
-        
 import streamlit as st
+import pandas as pd
+# from your_helpers import load_stocks_table, load_reference_tables, safe_row_get, safe_float
 
-# --- очистка названий колонок, один раз ---
-df.columns = [col.strip() for col in df.columns]
+# --- Загрузка таблиц ---
+try:
+    df_raw = load_stocks_table()
+    df_ref_zavod, df_ref_region = load_reference_tables()
+except FileNotFoundError as fe:
+    st.error(f"Ошибка авторизации Google API: {fe}")
+    st.stop()
+except Exception as e:
+    st.error(f"Ошибка при загрузке данных: {e}")
+    st.stop()
 
-# --- ищем колонку "Статус" один раз ---
-col_status = [col for col in df.columns if col.lower() == "статус"][0]
+# --- Проверяем, что есть данные ---
+if df_raw is None or df_raw.empty:
+    st.info("Нет данных таблицы «Акции».")
+    st.stop()
 
-# --- для отладки один раз выводим ---
-st.write(sheet.get_all_records()[0])
-st.write(df.columns)
+# --- Очистка названий колонок ---
+df_raw.columns = [col.strip() for col in df_raw.columns]
 
-# --- цикл по строкам ---
+# --- Определяем нужные колонки ---
+status_col = find_col_in_df(df_raw, ['Статус', 'status'])
+name_col = find_col_in_df(df_raw, ['назв', 'name'])
+type_col = find_col_in_df(df_raw, ['тип', 'type'])
+base_price_col = find_col_in_df(df_raw, ['баз', 'price', 'цена', 'cost'])
+mod_col = find_col_in_df(df_raw, ['модифик', 'modifier'])
+
+if status_col is None:
+    st.error("В таблице «Акции» не найдена колонка со статусом.")
+    st.stop()
+
+# --- Фильтруем открытые акции ---
+try:
+    status_series = df_raw[status_col].astype(str).str.upper()
+    open_mask = status_series.str.contains('ОТКР', regex=False)
+    open_stocks = df_raw[open_mask].copy()
+except Exception:
+    st.error("Не удалось отфильтровать открытые акции.")
+    st.stop()
+
+# --- Цикл по открытым акциям ---
 for i, row in open_stocks.iterrows():
     name = safe_row_get(row, [name_col] if name_col else [], default=f'#{i}')
     if not name:
@@ -555,11 +515,13 @@ for i, row in open_stocks.iterrows():
     typ = safe_row_get(row, [type_col] if type_col else [], default='')
     base_price = safe_float(safe_row_get(row, [base_price_col] if base_price_col else [], default=0))
     raw_mod = safe_row_get(row, [mod_col] if mod_col else [], default='')
-
     is_zavod = "завод" in str(typ).lower()
     
-    # --- статус для этой строки ---
-    status_value = row[col_status]
+    # --- Статус для этой строки ---
+    status_value = row[status_col]
+
+    # --- Здесь можно дальше обрабатывать акции, модификаторы и т.д. ---
+
 
     # Ищем модификаторы во ВСЕХ справочниках (региональный + заводской)
     parts = []
@@ -824,6 +786,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
