@@ -3,6 +3,7 @@ import gspread
 import pandas as pd
 import random
 import string
+import textwrap
 import plotly.graph_objects as go
 import plotly.express as px
 from oauth2client.service_account import ServiceAccountCredentials
@@ -1349,6 +1350,7 @@ with st.sidebar:
     """)
 
 market_display()
+
 
 
 
