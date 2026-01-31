@@ -1189,6 +1189,7 @@ def market_display():
         st.markdown("## 🔥 ТОП-5 АКЦИЙ ПО РОСТУ")
 
     # Display stocks
+# Отрисовка акций
     cols = st.columns(3)
     for idx, item in enumerate(processed):
         with cols[idx % 3]:
@@ -1198,40 +1199,38 @@ def market_display():
             color_cls = "pos" if pct >= 0 else "neg"
             highlight = "highlight-100" if abs(pct) > 100 else ""
 
+            # Добавляем значок позиции для топ-5
+            position_badge = ""
+            if st.session_state.view_mode == "top" and idx < 5:
+                position_icon = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"][idx]
+                position_badge = f"<div style='position:absolute; top:12px; right:12px; font-size:28px; z-index:10;'>{position_icon}</div>"
 
-# Добавляем значок позиции для топ-5
-position_badge = ""
-if st.session_state.view_mode == "top" and idx < 5:
-    position_icon = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"][idx]
-    # Убедись, что здесь чистый HTML без лишних пробелов или спецсимволов
-    position_badge = f"<div style='position:absolute; top:12px; right:12px; font-size:28px; z-index:10;'>{position_icon}</div>"
-
-# Формируем HTML карточки
-stock_html = f"""
-    <div class="stock-card {highlight}" style="position:relative;">
-        {position_badge}
-        <div class="stock-header">
-            <div style='width:100%;'>
-                <div class="stock-name">{item['Название']}</div>
-                <div class="stock-type">{item['Тип']}</div>
-            </div>
-        </div>
-        <div style='margin-top:auto; padding-top:16px;'>
-            <div style='display:flex; justify-content:space-between; align-items:flex-end;'>
-                <div>
-                    <div class="old-price">{item['Базовая цена']:.0f}$</div>
-                    <div class="current-price">{item['final_price']}$</div>
+            # Формируем HTML карточки
+            stock_html = f"""
+                <div class="stock-card {highlight}" style="position:relative;">
+                    {position_badge}
+                    <div class="stock-header">
+                        <div style='width:100%;'>
+                            <div class="stock-name">{item['Название']}</div>
+                            <div class="stock-type">{item['Тип']}</div>
+                        </div>
+                    </div>
+                    <div style='margin-top:auto; padding-top:16px;'>
+                        <div style='display:flex; justify-content:space-between; align-items:flex-end;'>
+                            <div>
+                                <div class="old-price">{item['Базовая цена']:.0f}$</div>
+                                <div class="current-price">{item['final_price']}$</div>
+                            </div>
+                            <div class="change-pct {color_cls}">{pct_text}</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="change-pct {color_cls}">{pct_text}</div>
-            </div>
-        </div>
-    </div>
-"""
-# Важно: используем именно st.markdown с ключом unsafe_allow_html=True
-# Отрисовка самой карточки
+            """
+            
+            # Вывод карточки
             st.markdown(stock_html, unsafe_allow_html=True)
 
-            # Кнопки под карточкой — ПРОВЕРЬ ОТСТУПЫ ЗДЕСЬ
+            # Кнопка покупки
             btn_col1, btn_col2, btn_col3 = st.columns([1, 2, 1])
             with btn_col2:
                 if st.button("🛒 КУПИТЬ", key=f"buy_{item['Название']}_{idx}", use_container_width=True):
@@ -1353,4 +1352,5 @@ with st.sidebar:
     """)
 
 market_display()
+
 
