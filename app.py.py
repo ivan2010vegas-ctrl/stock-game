@@ -539,13 +539,40 @@ def market_display():
         raw_mod = safe_row_get(row, [mod_col] if mod_col else [], default='')
 
         is_zavod = "завод" in str(typ).lower()
+        
+import streamlit as st
 
-        # Ищем модификаторы во ВСЕХ справочниках (региональный + заводской)
-        parts = []
-        if df_ref_region is not None and not df_ref_region.empty:
-            parts.append(df_ref_region.copy())
-        if df_ref_zavod is not None and not df_ref_zavod.empty:
-            parts.append(df_ref_zavod.copy())
+# --- очистка названий колонок, один раз ---
+df.columns = [col.strip() for col in df.columns]
+
+# --- ищем колонку "Статус" один раз ---
+col_status = [col for col in df.columns if col.lower() == "статус"][0]
+
+# --- для отладки один раз выводим ---
+st.write(sheet.get_all_records()[0])
+st.write(df.columns)
+
+# --- цикл по строкам ---
+for i, row in open_stocks.iterrows():
+    name = safe_row_get(row, [name_col] if name_col else [], default=f'#{i}')
+    if not name:
+        name = f'#{i}'
+    typ = safe_row_get(row, [type_col] if type_col else [], default='')
+    base_price = safe_float(safe_row_get(row, [base_price_col] if base_price_col else [], default=0))
+    raw_mod = safe_row_get(row, [mod_col] if mod_col else [], default='')
+
+    is_zavod = "завод" in str(typ).lower()
+    
+    # --- статус для этой строки ---
+    status_value = row[col_status]
+
+    # Ищем модификаторы во ВСЕХ справочниках (региональный + заводской)
+    parts = []
+    if df_ref_region is not None and not df_ref_region.empty:
+        parts.append(df_ref_region.copy())
+    if df_ref_zavod is not None and not df_ref_zavod.empty:
+        parts.append(df_ref_zavod.copy())
+
 
         if parts:
             ref_table = pd.concat(parts, ignore_index=True, sort=False)
@@ -801,5 +828,6 @@ with st.sidebar:
 
 
 market_display()
+
 
 
