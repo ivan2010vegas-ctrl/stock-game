@@ -653,7 +653,6 @@ if st.session_state.view_mode == "portfolio":
 
         if user_purchases.empty:
             st.info("У вас ещё нет покупок.")
-        else:
 
         user_purchases['_price_'] = user_purchases[col_price].apply(safe_float)
         grouped = user_purchases.groupby(col_name).agg(
@@ -824,6 +823,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
