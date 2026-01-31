@@ -143,50 +143,57 @@ def get_gspread_client():
         raise
 
 @st.cache_data(ttl=5)
-def load_reference_tables():
+def load_stocks_table():
     client = get_gspread_client()
+    try:
+        df = pd.DataFrame(
+            client.open("«Акции»").worksheet("Лист1").get_all_records()
+        )
+        st.sidebar.success(f"✅ Акции: {len(df)} строк")
+        return df
+    except Exception as e:
+        st.sidebar.error(f"❌ Акции: {e}")
+        return pd.DataFrame()
 
 
 @st.cache_data(ttl=5)
 def load_reference_tables():
     client = get_gspread_client()
+    
+    # Заводские модификаторы
     try:
         df_zavod = pd.DataFrame(
             client.open("«Таблица дификаторы_заводские_проценты»")
             .sheet1.get_all_records()
         )
-    except Exception:
+        st.sidebar.success(f"✅ Заводские: {len(df_zavod)} строк")
+    except Exception as e:
+        st.sidebar.error(f"❌ Заводские: {e}")
         df_zavod = pd.DataFrame(columns=["Значение", "%"])
 
+    # Региональные модификаторы
     try:
         df_region = pd.DataFrame(
             client.open("Таблица «Модификаторы_региональные_проценты»")
             .sheet1.get_all_records()
         )
-    except Exception:
+        st.sidebar.success(f"✅ Региональные: {len(df_region)} строк")
+    except Exception as e:
+        st.sidebar.error(f"❌ Региональные: {e}")
         df_region = pd.DataFrame(columns=["Значение", "%"])
 
     return df_zavod, df_region
-
-
-@st.cache_data(ttl=5)
-def load_stocks_table():
-    client = get_gspread_client()
-    try:
-        return pd.DataFrame(
-            client.open("«Акции»").worksheet("Лист1").get_all_records()
-        )
-    except Exception as e:
-        st.error(f"Ошибка загрузки таблицы 'Акции': {e}")
-        return pd.DataFrame()
 
 
 @st.cache_resource
 def get_buy_worksheet():
     client = get_gspread_client()
     try:
-        return client.open("Таблица «Покупки»").worksheet("Лист6")
-    except Exception:
+        ws = client.open("Таблица «Покупки»").worksheet("Лист6")
+        st.sidebar.success("✅ Покупки подключены")
+        return ws
+    except Exception as e:
+        st.sidebar.error(f"❌ Покупки: {e}")
         return None
 
 
@@ -195,8 +202,11 @@ def load_purchases():
     client = get_gspread_client()
     try:
         ws = client.open("Таблица «Покупки»").worksheet("Лист6")
-        return pd.DataFrame(ws.get_all_records())
-    except Exception:
+        df = pd.DataFrame(ws.get_all_records())
+        st.sidebar.success(f"✅ Покупки: {len(df)} записей")
+        return df
+    except Exception as e:
+        st.sidebar.error(f"❌ Покупки: {e}")
         return pd.DataFrame(columns=["time", "who", "name", "price", "tx_id"])
 
 
@@ -462,17 +472,16 @@ def market_display():
     )
 
     # -----------------------
-    # Кнопка обновить
-    # -----------------------
-    col_refresh, _ = st.columns([1, 6])
-    with col_refresh:
-        if st.button("Обновить"):
-            for func in [load_stocks_table, load_reference_tables, load_purchases, get_gspread_client]:
-                try:
-                    func.clear()
-                except Exception:
-                    pass
-            st.rerun()
+# Кнопка обновить
+# -----------------------
+col_refresh, col_debug = st.columns([1, 6])
+with col_refresh:
+    if st.button("🔄 Обновить + Очистить кеш"):
+        # Очистка ВСЕХ кешей
+        st.cache_data.clear()
+        st.cache_resource.clear()
+        st.success("Кеш очищен!")
+        st.rerun()
 
     # -----------------------
     # Остальной код (графики, акции, портфель)
@@ -817,6 +826,7 @@ with st.sidebar:
 
 
 market_display()
+
 
 
 
