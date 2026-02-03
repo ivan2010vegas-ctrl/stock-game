@@ -1299,7 +1299,7 @@ with st.sidebar:
     
     if not st.session_state.user:
         st.markdown("### 🔐 Вход в систему")
-        u = st.selectbox("Выберите пользователя:", ["артем", "богдан", "руслан", "разработчик"])
+        u = st.selectbox("Выберите пользователя:", ["артем", "богдан", "руслан", "разработчик","маша"])
         if st.button("🚀 ВОЙТИ", use_container_width=True):
             st.session_state.user = u
             st.success(f"Добро пожаловать, {u.upper()}!")
@@ -1350,4 +1350,5 @@ with st.sidebar:
     """)
 
 market_display()
+
 
