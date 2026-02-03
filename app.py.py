@@ -619,7 +619,7 @@ def get_gspread_client():
     )
     return gspread.authorize(creds)
 
-@st.cache_data(ttl=5)
+@st.cache_data(ttl=10)
 def load_stocks_table():
     client = get_gspread_client()
     try:
@@ -804,9 +804,9 @@ def sum_modifiers_and_list(raw_text, ref_df):
 if 'gold_history' not in st.session_state:
     st.session_state.gold_history = []
     p = 1200.0
-    for _ in range(20):
+    for _ in range(30):
         o = p
-        c = o + random.uniform(-10, 10)
+        c = o + random.uniform(-20, 20)
         h = max(o, c) + random.uniform(0, 5)
         l = min(o, c) - random.uniform(0, 5)
         st.session_state.gold_history.append({'open': o, 'high': h, 'low': l, 'close': c})
@@ -822,7 +822,7 @@ st.session_state.setdefault('purchase_dialog', None)
 # -----------------------
 # Main fragment
 # -----------------------
-@st.fragment(run_every=30)
+@st.fragment(run_every=60)
 def market_display():
     # Красивый заголовок с декорациями
     st.markdown("""
@@ -861,11 +861,11 @@ def market_display():
     # Обновление свечи золота
     last_close = st.session_state.gold_history[-1]['close']
     o = last_close
-    c = o + random.uniform(-15, 15)
+    c = o + random.uniform(-20, 20)
     h = max(o, c) + random.uniform(0, 7)
     l = min(o, c) - random.uniform(0, 7)
     st.session_state.gold_history.append({'open': o, 'high': h, 'low': l, 'close': c})
-    if len(st.session_state.gold_history) > 60:
+    if len(st.session_state.gold_history) > 100:
         st.session_state.gold_history.pop(0)
 
     # Загрузка данных
@@ -1350,6 +1350,7 @@ with st.sidebar:
     """)
 
 market_display()
+
 
 
 
