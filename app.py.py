@@ -806,9 +806,9 @@ if 'gold_history' not in st.session_state:
     p = 1200.0
     for _ in range(30):
         o = p
-        c = o + random.uniform(-20, 20)
-        h = max(o, c) + random.uniform(0, 5)
-        l = min(o, c) - random.uniform(0, 5)
+        c = o + random.uniform(-30, 30)
+        h = max(o, c) + random.uniform(0, 10)
+        l = min(o, c) - random.uniform(0, 10)
         st.session_state.gold_history.append({'open': o, 'high': h, 'low': l, 'close': c})
         p = c
 
@@ -1350,6 +1350,7 @@ with st.sidebar:
     """)
 
 market_display()
+
 
 
 
