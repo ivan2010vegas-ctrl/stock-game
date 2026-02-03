@@ -627,7 +627,7 @@ def load_stocks_table():
             client.open("«Акции»").worksheet("Лист1").get_all_records()
         )
     except Exception as e:
-        st.error(f"❌ Ошибка загрузки акций: {e}")
+        st.error(f"❌ Ошибка загрузки акций необходимо подождать: {e}")
         return pd.DataFrame()
 
 @st.cache_data(ttl=5)
@@ -1350,6 +1350,7 @@ with st.sidebar:
     """)
 
 market_display()
+
 
 
 
